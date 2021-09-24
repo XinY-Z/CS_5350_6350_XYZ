@@ -50,8 +50,7 @@ def get_split(dataset, metric):
     best_subset = dataset.groupby(best_attribute)
     for group, subset in best_subset:
         subsets.update({group: subset.drop(best_attribute, axis=1)})
-    return {'attribute': best_attribute, 'subsets': subsets, 'info': total_subset_metric}
-## todo: check the logic in split
+    return {'attribute': best_attribute, 'subsets': subsets, 'gain': best_gain}
 
 ## create leaf node:
 def to_leaf(dataset):
@@ -62,7 +61,7 @@ def split(node, metric, max_depth, depth):
     ## if no split occurs
     if len(node['subsets']) == 1:
         key = list(node['subsets'].keys())[0]
-        node['end'] = to_leaf(node['subsets'][key])
+        node[key] = to_leaf(node['subsets'][key])
         return
     ## if depth of the tree reaches the maximum
     if depth >= max_depth:
@@ -83,10 +82,13 @@ def learn(data, metric, max_depth):
 ## Predict label using learned decision tree
 def predict(node, case):
     test_group = case[node['attribute']]
-    if isinstance(node[test_group], dict):
-        return predict(node[test_group], case)
+    if test_group not in node:
+        return ['?']
     else:
-        return node[test_group]
+        if isinstance(node[test_group], dict):
+            return predict(node[test_group], case)
+        else:
+            return node[test_group]
 
 ## starter
 def id3(train, test, metric, max_depth):
