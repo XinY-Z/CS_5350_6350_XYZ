@@ -17,14 +17,11 @@ def get_metric(props, metric):
 ## metric selector
 def select_metric(props, metric):
     if metric == 'entropy':
-        if 0 in props:
-            entropy = 0
-        else:
-            entropy = sum([-v * np.log(v) for v in props])
+        entropy = sum([-v * np.log(v) for v in props if v != 0])
         return entropy
     if metric == 'majority_error':
         me = 1-max(props)
         return me
     if metric == 'gini':
-        gini = 1-sum([prop ** 2 for prop in props])
+        gini = 1-sum([v ** 2 for v in props])
         return gini

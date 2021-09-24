@@ -45,8 +45,12 @@ def get_split(dataset, metric):
             weighted_subset_metric = (nsubset / ndataset) * subset_metric
             total_subset_metric += weighted_subset_metric
         gain = total_metric - total_subset_metric
+        if gain < 0:
+            gain = 0
         if gain >= best_gain:
             best_attribute, best_gain = attribute, gain
+        '''print('attr is ' + attribute)
+        print('gain is ' + str(gain))'''
     best_subset = dataset.groupby(best_attribute)
     for group, subset in best_subset:
         subsets.update({group: subset.drop(best_attribute, axis=1)})
@@ -70,8 +74,17 @@ def split(node, metric, max_depth, depth):
         return
     else:
         for subset in node['subsets']:
-            node[subset] = get_split(node['subsets'][subset], metric)
-            split(node[subset], metric, max_depth, depth+1)
+            ## check if all labels are the same -> no need to split
+            all_label = node['subsets'][subset]['label'].to_list()
+            if all(all_label[0] == v for v in all_label):
+                node[subset] = to_leaf(node['subsets'][subset])
+            else:
+                node[subset] = get_split(node['subsets'][subset], metric)
+                if node[subset]['gain'] == 0:
+                    node[subset] = to_leaf(node['subsets'][subset])
+                else:
+                    split(node[subset], metric, max_depth, depth+1)
+                    # print(depth+1)
 
 ## Learn decision tree with ID3 algorithm
 def learn(data, metric, max_depth):
