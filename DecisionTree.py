@@ -5,18 +5,16 @@ from Metrics import get_metric, accuracy
 
 ## load a csv file
 def load_csv(filepath):
-    dataset = []
     if 'car' in filepath:
         attributes = ['buying', 'maint', 'doors', 'persons', 'lug_boot', 'safety', 'label']
     else:
         attributes = ['age', 'job', 'marital', 'education', 'default', 'balance', 'housing', 'loan', 'contact', 'day',
                       'month', 'duration', 'campaign', 'pdays', 'previous', 'poutcome', 'y']
-    with open(filepath, 'r') as f:
-        for line in f:
-            terms = line.strip().split(',')
-            dataset.append(terms)
-        dataset = pd.DataFrame(dataset, columns=attributes)
-        return dataset
+    dataset = pd.read_csv(filepath, names=attributes)
+    for attribute in dataset:
+        if is_numeric_dtype(dataset[attribute]):
+            dataset = num2bin(dataset, attribute)
+    return dataset
 
 ## calculate sample size
 def get_size(data):
@@ -49,8 +47,6 @@ def get_split(dataset, metric):
     best_attribute, best_gain = None, 0.0
     subsets = {}
     for attribute in [attribute for attribute in dataset if attribute != outcome_col]:
-        if is_numeric_dtype(dataset[attribute]):
-            dataset = num2bin(dataset, attribute)
         subset = dataset.groupby(attribute)
         total_subset_metric = 0.0
         for group in subset.groups:
@@ -136,5 +132,5 @@ def evaluate(train_dir, test_dir, algorithm, *args):
     predicted = [pred[0] for pred in predictions]
     test = load_csv(test_dir)
     actual = test.iloc[:, -1].to_list()
-    score = accuracy(actual, predicted)
+    score = 100 - accuracy(actual, predicted)
     return score
