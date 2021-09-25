@@ -11,9 +11,6 @@ def load_csv(filepath):
         attributes = ['age', 'job', 'marital', 'education', 'default', 'balance', 'housing', 'loan', 'contact', 'day',
                       'month', 'duration', 'campaign', 'pdays', 'previous', 'poutcome', 'y']
     dataset = pd.read_csv(filepath, names=attributes)
-    for attribute in dataset:
-        if is_numeric_dtype(dataset[attribute]):
-            dataset = num2bin(dataset, attribute)
     return dataset
 
 ## calculate sample size
@@ -33,10 +30,15 @@ def get_props(data):
     return props
 
 ## Split numeric values into binary
-def num2bin(dataset, attribute):
-    median = dataset[attribute].median()
-    dataset[attribute] = dataset[attribute].apply(lambda i: 'Left' if i <= median else 'Right')
-    return dataset
+def num2bin(dataset, attribute, train_values, datatype):
+    if datatype == 'train':
+        median = dataset[attribute].median()
+        dataset[attribute] = dataset[attribute].apply(lambda i: 'Left' if i <= median else 'Right')
+        train_values.update({attribute: median})
+        return dataset
+    elif datatype == 'test':
+        dataset[attribute] = dataset[attribute].apply(lambda i: 'Left' if i <= train_values[attribute] else 'Right')
+        return dataset
 
 ## select the best attribute
 def get_split(dataset, metric):
@@ -118,6 +120,13 @@ def predict(node, case):
 def id3(train_dir, test_dir, metric, max_depth):
     train = load_csv(train_dir)
     test = load_csv(test_dir)
+    train_values = {}
+    for attribute in train:
+        if is_numeric_dtype(train[attribute]):
+            train = num2bin(train, attribute, train_values, 'train')
+    for attribute in test:
+        if is_numeric_dtype(test[attribute]):
+            test = num2bin(test, attribute, train_values, 'test')
     tree = learn(train, metric, max_depth)
     predictions = list()
     for index in test.index:
