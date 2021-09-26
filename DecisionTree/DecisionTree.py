@@ -1,6 +1,6 @@
 ## Import packages
 import pandas as pd
-import sys, os
+import sys
 from pandas.api.types import is_numeric_dtype
 from Metrics import get_metric, accuracy
 
