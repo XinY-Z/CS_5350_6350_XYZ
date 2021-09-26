@@ -40,6 +40,16 @@ def num2bin(dataset, attribute, train_values, datatype):
         dataset[attribute] = dataset[attribute].apply(lambda i: 'Left' if i <= train_values[attribute] else 'Right')
         return dataset
 
+## Replace missing values
+def impute(dataset, attribute, train_modes, datatype):
+    if datatype == 'train':
+        mode = dataset[attribute].mode()
+        dataset[attribute] = dataset[attribute].replace(['unknown'], mode)
+        train_modes.update({attribute: mode})
+    elif datatype == 'test':
+        dataset[attribute] = dataset[attribute].replace(['unknown'], train_modes[attribute])
+    return dataset
+
 ## select the best attribute
 def get_split(dataset, metric):
     outcome_col = [col for col in dataset][-1]
@@ -117,16 +127,21 @@ def predict(node, case):
             return node[test_group]
 
 ## starter
-def id3(train_dir, test_dir, metric, max_depth):
+def id3(train_dir, test_dir, metric, max_depth, impute_missing = False):
     train = load_csv(train_dir)
     test = load_csv(test_dir)
     train_values = {}
+    train_modes = {}
     for attribute in train:
         if is_numeric_dtype(train[attribute]):
             train = num2bin(train, attribute, train_values, 'train')
+        if impute_missing and 'unknown' in train[attribute].values:
+            train = impute(train, attribute, train_modes, 'train')
     for attribute in test:
         if is_numeric_dtype(test[attribute]):
             test = num2bin(test, attribute, train_values, 'test')
+        if impute_missing and 'unknown' in test[attribute].values:
+            test = impute(test, attribute, train_modes, 'test')
     tree = learn(train, metric, max_depth)
     predictions = list()
     for index in test.index:
