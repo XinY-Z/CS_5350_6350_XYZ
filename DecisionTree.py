@@ -164,6 +164,11 @@ def evaluate(train_dir, test_dir, algorithm, *args):
     score = 100 - accuracy(actual, predictions)
     return score
 
+## export result
+def export(score):
+    f = open('prediction.txt', 'w', encoding='utf-8')
+    f.write('Prediction error: %.1f' % score)
+    f.close()
 
 if __name__ == '__main__':
     train_file = sys.argv[1]
@@ -175,6 +180,4 @@ if __name__ == '__main__':
         test_score = evaluate(train_file, test_file, id3, metric_input, depth_input, impute_input)
     else:
         test_score = evaluate(train_file, test_file, id3, metric_input, depth_input)
-    f = open('prediction.txt', 'w', encoding='utf-8')
-    f.write('Prediction error: %.1f' % test_score)
-    f.close()
+    export(test_score)
