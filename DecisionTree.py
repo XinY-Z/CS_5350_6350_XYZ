@@ -168,9 +168,9 @@ def evaluate(train_dir, test_dir, algorithm, *args):
 if __name__ == '__main__':
     train_file = sys.argv[1]
     test_file = sys.argv[2]
-    metric_input = input('Which metric do you use? (entropy/majority_index/gini)')
-    depth_input = int(input('How many levels do you expect for the tree?'))
-    impute_input = input('Do you want to impute missing values? (Y/N)')
+    metric_input = input('Which metric do you use? (entropy/majority_index/gini): ')
+    depth_input = int(input('How many levels do you expect for the tree?: '))
+    impute_input = input('Do you want to impute missing values? (Y/N): ')
     if impute_input == 'Y':
         test_score = evaluate(train_file, test_file, id3, metric_input, depth_input, impute_input)
     else:
