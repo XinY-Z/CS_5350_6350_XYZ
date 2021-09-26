@@ -175,5 +175,6 @@ if __name__ == '__main__':
         test_score = evaluate(train_file, test_file, id3, metric_input, depth_input, impute_input)
     else:
         test_score = evaluate(train_file, test_file, id3, metric_input, depth_input)
-    with open('prediction.txt', 'w') as f:
-        f.write('Prediction error in percentage: %.1f' % test_score)
+    f = open('prediction.txt', 'w', encoding='utf-8')
+    f.write('Prediction error: %.1f' % test_score)
+    f.close()
