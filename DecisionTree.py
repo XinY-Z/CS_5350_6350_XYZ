@@ -1,5 +1,6 @@
 ## Import packages
 import pandas as pd
+import sys
 from pandas.api.types import is_numeric_dtype
 from Metrics import get_metric, accuracy
 
@@ -148,13 +149,29 @@ def id3(train_dir, test_dir, metric, max_depth, impute_missing = False):
         case = test.iloc[index]
         prediction = predict(tree, case)
         predictions.append(prediction)
-    return predictions
+    predicted = [pred[0] for pred in predictions]
+    print_sel = input('Do you want to print out the predicted values? (Y/N): ')
+    if print_sel == 'Y':
+        print('Predicted values: \n')
+        print(predicted)
+    return predicted
 
 ## evaluate algorithm
 def evaluate(train_dir, test_dir, algorithm, *args):
     predictions = algorithm(train_dir, test_dir, *args)
-    predicted = [pred[0] for pred in predictions]
     test = load_csv(test_dir)
     actual = test.iloc[:, -1].to_list()
-    score = 100 - accuracy(actual, predicted)
+    score = 100 - accuracy(actual, predictions)
     return score
+
+
+if __name__ == '__main__':
+    train_file = sys.argv[1]
+    test_file = sys.argv[2]
+    metric_input = sys.argv[3]
+    depth_input = int(sys.argv[4])
+    if len(sys.argv) > 5:
+        impute_input = True if sys.argv[5] == 'True' else False
+        test_score = evaluate(train_file, test_file, id3, metric_input, depth_input, impute_input)
+    test_score = evaluate(train_file, test_file, id3, metric_input, depth_input)
+    print('Prediction error (%): ' + str(test_score))
