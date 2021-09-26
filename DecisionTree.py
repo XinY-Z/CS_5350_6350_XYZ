@@ -173,5 +173,6 @@ if __name__ == '__main__':
     if len(sys.argv) > 5:
         impute_input = True if sys.argv[5] == 'True' else False
         test_score = evaluate(train_file, test_file, id3, metric_input, depth_input, impute_input)
-    test_score = evaluate(train_file, test_file, id3, metric_input, depth_input)
+    else:
+        test_score = evaluate(train_file, test_file, id3, metric_input, depth_input)
     print('Prediction error (%): ' + str(test_score))
