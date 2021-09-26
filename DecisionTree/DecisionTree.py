@@ -175,4 +175,4 @@ if __name__ == '__main__':
         test_score = evaluate(train_file, test_file, id3, metric_input, depth_input, impute_input)
     else:
         test_score = evaluate(train_file, test_file, id3, metric_input, depth_input)
-    print('Prediction error: %.1f' % test_score)
+    print('Prediction error: %.1f' % test_score + '%')
