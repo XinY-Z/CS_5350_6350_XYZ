@@ -1,6 +1,6 @@
 ## Import packages
 import pandas as pd
-import sys
+import sys, os
 from pandas.api.types import is_numeric_dtype
 from Metrics import get_metric, accuracy
 
@@ -166,7 +166,7 @@ def evaluate(train_dir, test_dir, algorithm, *args):
 
 ## export result
 def export(score):
-    f = open('prediction.txt', 'w', encoding='utf-8')
+    f = open(os.getcwd() + '\\prediction.txt', 'w', encoding='utf-8')
     f.write('Prediction error: %.1f' % score)
     f.close()
 
