@@ -2,12 +2,12 @@
 import numpy as np
 
 ## calculate accuracy
-def accuracy(actual, predicted):
+def get_accuracy(actual, predicted):
     correct = 0
     for i in range(len(actual)):
         if actual[i] == predicted[i]:
             correct += 1
-    return correct / float(len(actual)) * 100.0
+    return correct / float(len(actual))
 
 ## calculate information gain
 def get_metric(props, metric):
