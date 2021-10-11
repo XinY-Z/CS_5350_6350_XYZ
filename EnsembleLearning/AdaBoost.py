@@ -1,9 +1,9 @@
 ## Import packages
 import numpy as np
 import pandas as pd
-import sys
 from pandas.api.types import is_numeric_dtype
 from Metrics import get_metric, get_accuracy
+
 
 ## load a csv file
 def load_csv(filepath):
@@ -60,14 +60,16 @@ def impute(dataset, attribute, train_modes, datatype):
 
 ## select the best attribute
 def get_split(dataset, metric):
-    outcome_col = [col for col in dataset][-1]
+    not_attributes = ['y', 'weight']
     ndataset = get_size(dataset)
+    # print(ndataset)
     total_props = get_props(dataset)
+    # print(dataset)
     total_metric = get_metric(total_props, metric=metric)
     best_attribute, best_gain = None, 0.0
     subsets = {}
 
-    for attribute in [attribute for attribute in dataset if attribute != outcome_col]:
+    for attribute in [attribute for attribute in dataset if attribute not in not_attributes]:
         subset = dataset.groupby(attribute)
         total_subset_metric = 0.0
         for group in subset.groups:
@@ -136,12 +138,26 @@ def predict(node, case):
             return node[test_group]
 
 ## return predicted values using ID3
-def id3(train_dir, test_dir, metric, max_depth, impute_missing=False):
+def id3(train, test, metric, max_depth):
+    predictions = []
+
+    tree = learn(train, metric, max_depth)
+    for index in test.index:
+        case = test.iloc[index]
+        prediction = predict(tree, case)
+        predictions.append(prediction)
+    predicted = [pred[0] for pred in predictions]
+    return predicted
+
+## return predicted values using adaboost
+def adaboost(train_dir, test_dir, max_iter, impute_missing=False):
     train = load_csv(train_dir)
     test = load_csv(test_dir)
+    iteration = 1
+    trees = []
+    predictions = []
     train_values = {}
     train_modes = {}
-    predictions = []
 
     for attribute in train:
         if is_numeric_dtype(train[attribute]):
@@ -153,34 +169,20 @@ def id3(train_dir, test_dir, metric, max_depth, impute_missing=False):
             test = num2bin(test, attribute, train_values, 'test')
         if impute_missing and 'unknown' in test[attribute].values:
             test = impute(test, attribute, train_modes, 'test')
-    tree = learn(train, metric, max_depth)
 
-    for index in test.index:
-        case = test.iloc[index]
-        prediction = predict(tree, case)
-        predictions.append(prediction)
-    predicted = [pred[0] for pred in predictions]
-    return predicted
-
-## return predicted values using adaboost
-def adaboost(train_dir, test_dir, max_iter):
-    train = load_csv(train_dir)
-    test = load_csv(test_dir)
     size = get_size(train)
     train['weight'] = [1/size] * size
-    iteration = 1
-    trees = []
-    predictions = []
 
     while iteration <= max_iter:
         tree = learn(train, metric='entropy', max_depth=2)
-        predicted = id3(train_dir, train_dir, metric='entropy', max_depth=2)
+        predicted = id3(train, train, metric='entropy', max_depth=2)
         actual = load_csv(train_dir)['y'].to_list()
         error = 1 - get_accuracy(actual, predicted)
         vote = get_vote(error)
-        updated_weight = update_weight(train['weight'], vote, actual, predicted)
-        train['weight'] = updated_weight
+        updated_weight = update_weight(train['weight'].to_list(), vote, actual, predicted)
+        train.replace({'weight': updated_weight})
         trees.append((vote, tree))
+        print(f'Iteration {iteration} completed.')
         iteration += 1
 
     for index in test.index:
@@ -188,22 +190,7 @@ def adaboost(train_dir, test_dir, max_iter):
         case = test.iloc[index]
         for vote, tree in trees:
             subprediction = predict(tree, case)
-            subpredictions.append((vote, subprediction))
+            subpredictions.append((vote, subprediction[0]))
         prediction = pd.DataFrame(subpredictions).groupby(1).sum().idxmax().to_list()
         predictions.append(prediction[0])
     return predictions
-
-## evaluate algorithm
-def evaluate(train_dir, test_dir, algorithm, *args):
-    predictions = algorithm(train_dir, test_dir, *args)
-    test = load_csv(test_dir)
-    actual = test['y'].to_list()
-    error = 1 - get_accuracy(actual, predictions)
-    return error
-
-
-if __name__ == '__main__':
-    train_file = sys.argv[1]
-    test_file = sys.argv[2]
-    test_score = evaluate(train_file, test_file, adaboost)
-    print('Prediction error (%): ' + str(test_score))
