@@ -13,7 +13,7 @@ def load_csv(filepath):
 
 ## calculate sample size
 def get_size(data):
-    size = data['weight'].sum()
+    size = data.shape[0]
     return size
 
 ## calculate vote for a classifier
@@ -21,26 +21,16 @@ def get_vote(error):
     alpha = 1/2 * np.log((1-error)/error)
     return alpha
 
-## update weights of examples
-def update_weight(weight, alpha, actual, predicted):
-    for i in range(len(actual)):
-        if actual[i] == predicted[i]:
-            weight[i] = weight[i] * np.exp(-alpha)
-        elif actual[i] != predicted[i]:
-            weight[i] = weight[i] * np.exp(alpha)
-        else:
-            pass
-    weights = [w / sum(weight) for w in weight]
-    return weights
-
-## calculate weighted proportions of label values in a set/subset
+## calculate proportions of label values in a set/subset
 def get_props(data):
-    weights = {}.fromkeys(['no', 'yes'], 0)
-    weights_new = data.groupby('y')['weight'].sum().to_dict()
-    weights_new = {i: v/get_size(data) for i, v in weights_new.items()}
-    weights.update(weights_new)
-    weighted_prop = [v for v in weights.values()]
-    return weighted_prop
+    keys = set(data.iloc[:, -1])
+    counts = {}.fromkeys(keys, 0)
+    new_counts = data.iloc[:, -1].value_counts().to_dict()
+    counts.update(new_counts)
+    counts_list = [v for v in counts.values()]
+    counts_sum = sum(counts_list)
+    props = [v / counts_sum for v in counts_list]
+    return props
 
 ## Split numeric values into binary
 def num2bin(dataset, attribute, train_values, datatype):
@@ -53,40 +43,27 @@ def num2bin(dataset, attribute, train_values, datatype):
         dataset[attribute] = dataset[attribute].apply(lambda i: 'Left' if i <= train_values[attribute] else 'Right')
         return dataset
 
-## Replace missing values
-def impute(dataset, attribute, train_modes, datatype):
-    if datatype == 'train':
-        mode = dataset[attribute].mode()
-        dataset[attribute] = dataset[attribute].replace(['unknown'], mode)
-        train_modes.update({attribute: mode})
-    elif datatype == 'test':
-        dataset[attribute] = dataset[attribute].replace(['unknown'], train_modes[attribute])
-    return dataset
-
 ## select the best attribute
 def get_split(dataset, metric):
-    not_attributes = ['y', 'weight']
+    ndataset = get_size(dataset)
     total_props = get_props(dataset)
     total_metric = get_metric(total_props, metric=metric)
-    best_attribute, best_gain = None, 0.0
+    best_attribute, best_gain = dataset.columns[0], 0.0
     subsets = {}
-
-    for attribute in [attribute for attribute in dataset if attribute not in not_attributes]:
+    for attribute in [attribute for attribute in dataset if attribute != 'y']:
         subset = dataset.groupby(attribute)
         total_subset_metric = 0.0
         for group in subset.groups:
-            subset_size = get_size(subset.get_group(group))
+            nsubset = get_size(subset.get_group(group))
             subset_props = get_props(subset.get_group(group))
             subset_metric = get_metric(subset_props, metric=metric)
-            weighted_subset_metric = (subset_size / 1) * subset_metric
+            weighted_subset_metric = (nsubset / ndataset) * subset_metric
             total_subset_metric += weighted_subset_metric
         gain = total_metric - total_subset_metric
         if gain < 0:
             gain = 0
         if gain >= best_gain:
             best_attribute, best_gain = attribute, gain
-        '''print('attr is ' + attribute)
-        print('gain is ' + str(gain))'''
     best_subset = dataset.groupby(best_attribute)
     for group, subset in best_subset:
         subsets.update({group: subset.drop(best_attribute, axis=1)})
@@ -151,59 +128,51 @@ def id3(train, test, metric, max_depth):
     return predicted
 
 ## return predicted values using adaboost
-def adaboost(train_dir, test_dir, max_iter, impute_missing=False):
+def randomforest(train_dir, test_dir, max_iter, m, f):
+
+    ## initiation
     train = load_csv(train_dir)
     test = load_csv(test_dir)
     iteration = 1
     trees = []
     predictions = []
-    train_values = {}
-    train_modes = {}
+    np.random.seed(123)
 
-    ## convert numeric attributes to binary ones; impute missing values (deprecated)
+    ## data preprocessing: convert numeric attributes to binary ones
+    train_values = {}
     for attribute in train:
         if is_numeric_dtype(train[attribute]):
             train = num2bin(train, attribute, train_values, 'train')
-        if impute_missing and 'unknown' in train[attribute].values:
-            train = impute(train, attribute, train_modes, 'train')
     for attribute in test:
         if is_numeric_dtype(test[attribute]):
             test = num2bin(test, attribute, train_values, 'test')
-        if impute_missing and 'unknown' in test[attribute].values:
-            test = impute(test, attribute, train_modes, 'test')
-
-    ## initiate sample weights
-    size = train.shape[0]
-    train['weight'] = [1/size] * size
 
     ## iterate and update sample weights
     while iteration <= max_iter:
-        # Calculate training error and vote
-        predicted = id3(train, train, metric='entropy', max_depth=2)
-        actual = train['y'].to_list()
-        weights = train['weight'].to_list()
-        error = get_error(weights, actual, predicted)
-        # print(error)        # training error increases and reaches ~50% in 3 rounds. Something funny here.
-        vote = get_vote(error)
 
-        # Store the vote and tree from current iteration
-        tree = learn(train, metric='entropy', max_depth=2)
-        trees.append((vote, tree))
+        ## randomly select m samples
+        total_m = train.shape[0]
+        total_f = train.shape[1] - 1
+        y_ind = train.columns.get_loc('y')
+        inds_m = np.random.choice(total_m, m, replace=True)
+        inds_f = np.random.choice(total_f, f, replace=False)
+        inds_f = np.append(inds_f, y_ind)
+        samples = train.iloc[inds_m, inds_f]
 
-        # Update with new weights
-        updated_weights = update_weight(train['weight'].to_list(), vote, actual, predicted)
-        train['weight'] = updated_weights
+        # learn and store the tree from current iteration
+        tree = learn(samples, metric='entropy', max_depth=9999)
+        trees.append(tree)
 
         # Complete the iteration
-        print(f'Iteration {iteration} completed.')
+        print(f'Iteration {iteration} completed')
         iteration += 1
 
     for index in test.index:
         subpredictions = []
         case = test.iloc[index]
-        for vote, tree in trees:
+        for tree in trees:
             subprediction = predict(tree, case)
-            subpredictions.append((vote, subprediction[0]))
-        prediction = pd.DataFrame(subpredictions).groupby(1).sum().idxmax().to_list()
-        predictions.append(prediction[0])
+            subpredictions.append(subprediction[0])
+        prediction = max(set(subpredictions), key=subpredictions.count)
+        predictions.append(prediction)
     return predictions
