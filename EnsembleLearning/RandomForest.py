@@ -150,7 +150,7 @@ def randomforest(train_dir, test_dir, max_iter, m, f):
     ## iterate and update sample weights
     while iteration <= max_iter:
 
-        ## randomly select m samples
+        ## randomly select m samples and f features
         total_m = train.shape[0]
         total_f = train.shape[1] - 1
         y_ind = train.columns.get_loc('y')
@@ -167,6 +167,7 @@ def randomforest(train_dir, test_dir, max_iter, m, f):
         print(f'Iteration {iteration} completed')
         iteration += 1
 
+    # Make predictions
     for index in test.index:
         subpredictions = []
         case = test.iloc[index]

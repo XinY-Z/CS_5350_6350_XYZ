@@ -24,7 +24,8 @@ if __name__ == '__main__':
         max_samples = int(sys.argv[5])
         max_features = int(sys.argv[6])
     except IndexError:
-        pass
+        max_samples = 500
+        max_features = 3
 
     train_errors = []
     test_errors = []
