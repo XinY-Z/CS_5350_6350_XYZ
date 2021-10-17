@@ -10,7 +10,7 @@ def plot_classifier(niters, train_errors, test_errors):
 
 def plot_regressor(niters, costs):
     plt.plot(niters, costs)
-    plt.xlabel('Number of Iterations')
+    plt.xlabel('Number of Updates')
     plt.ylabel('Cost')
     plt.title('Cost Function of Training by Iteration')
     plt.show()
