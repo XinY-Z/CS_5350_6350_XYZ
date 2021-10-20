@@ -1,1 +1,1 @@
-python DecisionTree.py ./car/train.csv ./car/test.csv
+python3 DecisionTree.py ./car/train.csv ./car/test.csv
