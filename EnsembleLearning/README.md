@@ -1,7 +1,7 @@
 To run the program, either click the run.sh file or open a command prompt and change the directory to the current folder. 
 Then type  
 
-`python3 driver.py <directory of training set> <directory of test set> <algorithm> <max iteration>`  
+`python3 Driver.py <directory of training set> <directory of test set> <algorithm> <max iteration>`  
 
 `<algorithm>` allows you to 
 choose the algorithm to build the model; you can choose either `adaboost`, `bagging`, or 
