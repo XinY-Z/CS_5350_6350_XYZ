@@ -19,6 +19,7 @@ skf = StratifiedKFold(n_splits=10)
 train_index = np.random.choice(dataset.shape[0], dataset.shape[0] * 9 // 10, replace=False)
 test_index = [index for index in range(dataset.shape[0]) if index not in train_index]'''
 
+## train averaged perceptron and return error rates
 train_errors, test_errors = [], []
 for train_index, test_index in skf.split(dataset_x, dataset_y):
     train_x, test_x = dataset_x[train_index], dataset_x[test_index]
