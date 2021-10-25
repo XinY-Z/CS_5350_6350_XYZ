@@ -1,20 +1,22 @@
 from sklearn.linear_model import SGDClassifier
 from sklearn.model_selection import StratifiedKFold
 from FinalProject.LanguageModel.TfIdf import dataset
+import numpy as np
 
 
-## Instantiate perceptron algorithm
+## Instantiate SVM algorithm
 clf = SGDClassifier(
     loss='hinge',
     random_state=1
 )
 
-## Split dataset into training (2/3 of total) and test (1/3) sets
+## Use stratified k-fold cross validation to split dataset
 dataset_x = dataset.iloc[:, :-1]
 dataset_y = dataset.iloc[:, -1]
 skf = StratifiedKFold(n_splits=10)
 skf.split(dataset_x, dataset_y)
 
+## train SVM and return 
 train_errors, test_errors = [], []
 for train_index, test_index in skf.split(dataset_x, dataset_y):
     train_x, test_x = dataset_x[train_index], dataset_x[test_index]
@@ -25,3 +27,6 @@ for train_index, test_index in skf.split(dataset_x, dataset_y):
     test_error = 1 - clf.score(test_x, test_y)
     train_errors.append(train_error)
     test_errors.append(test_error)
+    
+print(f'Training error: {np.mean(train_errors)}')
+print(f'Test error: {np.mean(test_errors)}')
