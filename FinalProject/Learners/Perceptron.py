@@ -1,6 +1,7 @@
 from sklearn.linear_model import SGDClassifier
 from sklearn.model_selection import StratifiedKFold
 from FinalProject.LanguageModel.TfIdf import dataset
+import numpy as np
 
 
 ## Instantiate perceptron algorithm
@@ -28,3 +29,6 @@ for train_index, test_index in skf.split(dataset_x, dataset_y):
     test_error = 1 - clf.score(test_x, test_y)
     train_errors.append(train_error)
     test_errors.append(test_error)
+
+print(f'Training error: {np.mean(train_errors)}')
+print(f'Test error: {np.mean(test_errors)}')
