@@ -11,6 +11,8 @@ def plot(sizes):
     plt.hist(sizes, bins=range(100))
     plt.xlim(0, 100)
     plt.xticks(range(0, 101, 10))
+    plt.xlabel('Number of Messages')
+    plt.title('Distribution of Lengths of Conversations, <= 100-message shown')
     return plt
 
 ## assign message counts to each encounter
