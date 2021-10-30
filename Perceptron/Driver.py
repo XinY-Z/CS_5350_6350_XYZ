@@ -1,7 +1,8 @@
-from Perceptron import Perceptron
-from Perceptron import VotedPerceptron
-from Perceptron import AveragedPerceptron
+import Perceptron
+import VotedPerceptron
+import AveragedPerceptron
 import sys
+
 
 ## calculate error
 def get_error(predicted, actual):
