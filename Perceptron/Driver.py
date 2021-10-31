@@ -1,6 +1,6 @@
-import Perceptron
-import VotedPerceptron
-import AveragedPerceptron
+from Perceptron import Perceptron
+from Perceptron import VotedPerceptron
+from Perceptron import AveragedPerceptron
 import sys
 
 
