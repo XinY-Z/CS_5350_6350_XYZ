@@ -46,6 +46,3 @@ if __name__ == '__main__':
     else:
         raise NameError('Unknown algorithm. Please check your spelling.')
     run(train_file, test_file, algorithm, alpha, max_iter)
-
-train_file = './Perceptron/bank-note/train.csv'
-test_file = './Perceptron/bank-note/test.csv'
