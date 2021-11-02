@@ -31,7 +31,6 @@ class Vectorizer(TfidfVectorizer):
         doclist = [' '.join(doc) for doc in doclist]
         ## remove redacted parts
         doclist = [re.sub('\[(.*?)]', '', doc) for doc in doclist]
-
         self.doclist = doclist
 
     ## Convert texts to vectors using tf-idf
@@ -54,6 +53,6 @@ class Vectorizer(TfidfVectorizer):
 
         ## Create new dataset in which texts are converted to vectors
         dropout_list = self.input.groupby('encounterId').head(1)['dropout'].to_list()
-        self.data = pd.DataFrame({'encounterId': self.input['encounterId'].unique(),
-                                  'vec': [i for i in tf_idf.toarray()],
-                                  'outcome': dropout_list})
+        self.data = pd.DataFrame(data=tf_idf.toarray(),
+                                 columns=['x'+str(i+1) for i in range(tf_idf.toarray().shape[1])])
+        self.data['outcome'] = dropout_list

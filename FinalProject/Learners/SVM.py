@@ -21,8 +21,8 @@ skf = StratifiedKFold(n_splits=10)
 ## train SVM and return error rates
 train_errors, test_errors = [], []
 for train_index, test_index in skf.split(dataset_x, dataset_y):
-    train_x, test_x = dataset_x[train_index], dataset_x[test_index]
-    train_y, test_y = dataset_y[train_index], dataset_y[test_index]
+    train_x, test_x = dataset_x.iloc[train_index], dataset_x.iloc[test_index]
+    train_y, test_y = dataset_y.iloc[train_index], dataset_y.iloc[test_index]
 
     clf.fit(train_x, train_y)
     train_error = 1 - clf.score(train_x, train_y)
