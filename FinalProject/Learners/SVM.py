@@ -1,8 +1,11 @@
 from sklearn.linear_model import SGDClassifier
 from sklearn.model_selection import StratifiedKFold
-from FinalProject.LanguageModel.TfIdf import dataset
+from FinalProject.LanguageModel.TfIdf import Vectorizer
 import numpy as np
 
+vectorizer = Vectorizer(ngram=2, nmessage=3)
+vectorizer.text2vec()
+dataset = vectorizer.data
 
 ## Instantiate SVM algorithm
 clf = SGDClassifier(
@@ -14,7 +17,6 @@ clf = SGDClassifier(
 dataset_x = dataset.iloc[:, :-1]
 dataset_y = dataset.iloc[:, -1]
 skf = StratifiedKFold(n_splits=10)
-skf.split(dataset_x, dataset_y)
 
 ## train SVM and return error rates
 train_errors, test_errors = [], []

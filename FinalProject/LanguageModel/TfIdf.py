@@ -2,32 +2,58 @@ import pandas as pd
 import re
 from sklearn.feature_extraction.text import TfidfVectorizer
 from FinalProject.LanguageModel.Preprocessor import preprocessor
-from FinalProject.Descriptive import data
+from FinalProject.DataLoader import DataLoader
 
 
-## instantiate tf-idf vectorizer (2-gram)
-tfidf = TfidfVectorizer(ngram_range=(2,2), preprocessor=preprocessor)
+dataloader = DataLoader(r'C:\Users\XinZ\Box\SafeUT_Data\Final_Anonymization\FINAL_ANONYMIZED_SAFEUT.xlsx')
+dataloader.random_select(500)
+dataloader.to_dropout(6)
 
-## remove auto-generated messages
-data = data[data['originator'] != 'Auto']
+class Vectorizer(TfidfVectorizer):
 
-## select first x messages in each encounter as predictor (x=3)
-## transform data structure to feed sklearn tf-idf
-data_sel = data.groupby('encounterId').head(3)[['messageId', 'encounterId', 'originator', 'message', 'dropout']]
-data_sel['message'] = data_sel['message'].apply(lambda x: str(x))
-doclist = data_sel.groupby('encounterId')['message'].apply(list).to_list()
-doclist = [' '.join(doc) for doc in doclist]
-## remove redacted parts
-doclist = [re.sub('\[(.*?)]', '', doc) for doc in doclist]
+    def __init__(self, ngram=2, nmessage=3):
+        super().__init__()
+        self.__nmessage = nmessage
+        self.__ngram = ngram
+        self.input = dataloader.data
+        self.doclist = []
+        self.data = pd.DataFrame()
 
-## create dictionary for words with tf-idf scores
-tf_idf = tfidf.fit_transform(doclist)
-'''word_scores = pd.DataFrame(tf_idf[0].T.todense(), index=tfidf.get_feature_names_out(), columns=["TF-IDF"])
-word_scores = word_scores.sort_values('TF-IDF', ascending=False)
-dictionary = word_scores.to_dict()['TF-IDF']'''
+    ## select first x messages in each encounter as predictor (x=3)
+    ## transform data structure to feed sklearn tf-idf
+    def preprocess(self):
 
-## calculate tf-idf vectors for each encounter
-dropout_list = data_sel.groupby('encounterId').head(1)['dropout'].to_list()
-dataset = pd.DataFrame({'encounterId': data_sel['encounterId'].unique(),
-                        'vec': [i for i in tf_idf.toarray()],
-                        'outcome': dropout_list})
+        ## remove auto-generated messages
+        self.input = self.input[self.input['originator'] != 'Auto']
+        data_sel = self.input.groupby('encounterId').head(self.__nmessage)[['messageId', 'encounterId', 'originator', 'message', 'dropout']]
+        data_sel['message'] = data_sel['message'].apply(lambda x: str(x))
+        doclist = data_sel.groupby('encounterId')['message'].apply(list).to_list()
+        doclist = [' '.join(doc) for doc in doclist]
+        ## remove redacted parts
+        doclist = [re.sub('\[(.*?)]', '', doc) for doc in doclist]
+
+        self.doclist = doclist
+
+    ## create dictionary for words with tf-idf scores
+    def text2vec(self):
+        self.preprocess()
+
+        ## instantiate tf-idf vectorizer
+        if isinstance(self.__ngram, int):
+            tfidf = TfidfVectorizer(ngram_range=(self.__ngram, self.__ngram), preprocessor=preprocessor)
+        elif isinstance(self.__ngram, tuple):
+            tfidf = TfidfVectorizer(ngram_range=(self.__ngram[0], self.__ngram[1]), preprocessor=preprocessor)
+        else:
+            raise TypeError('Argument "ngram" must be int or tuple.')
+
+        ## Vectorize the texts
+        tf_idf = tfidf.fit_transform(self.doclist)
+        '''word_scores = pd.DataFrame(tf_idf[0].T.todense(), index=tfidf.get_feature_names_out(), columns=["TF-IDF"])
+        word_scores = word_scores.sort_values('TF-IDF', ascending=False)
+        dictionary = word_scores.to_dict()['TF-IDF']'''
+
+        ## Create dataset in which texts are converted to vectors
+        dropout_list = self.input.groupby('encounterId').head(1)['dropout'].to_list()
+        self.data = pd.DataFrame({'encounterId': self.input['encounterId'].unique(),
+                                  'vec': [i for i in tf_idf.toarray()],
+                                  'outcome': dropout_list})
