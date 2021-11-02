@@ -20,7 +20,7 @@ class Vectorizer(TfidfVectorizer):
         self.data = pd.DataFrame()
 
     ## select first x messages in each encounter as predictor (x=3)
-    ## transform data structure to feed sklearn tf-idf
+    ## transform data structure to feed sklearn tf-idf vectorizer
     def preprocess(self):
 
         ## remove auto-generated messages
@@ -34,7 +34,7 @@ class Vectorizer(TfidfVectorizer):
 
         self.doclist = doclist
 
-    ## create dictionary for words with tf-idf scores
+    ## Convert texts to vectors using tf-idf
     def text2vec(self):
         self.preprocess()
 
@@ -52,7 +52,7 @@ class Vectorizer(TfidfVectorizer):
         word_scores = word_scores.sort_values('TF-IDF', ascending=False)
         dictionary = word_scores.to_dict()['TF-IDF']'''
 
-        ## Create dataset in which texts are converted to vectors
+        ## Create new dataset in which texts are converted to vectors
         dropout_list = self.input.groupby('encounterId').head(1)['dropout'].to_list()
         self.data = pd.DataFrame({'encounterId': self.input['encounterId'].unique(),
                                   'vec': [i for i in tf_idf.toarray()],
