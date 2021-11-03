@@ -19,7 +19,7 @@ dataset_x = dataset.iloc[:, :-1]
 dataset_y = dataset.iloc[:, -1]
 skf = StratifiedKFold(n_splits=10)
 
-## train SVM and return error rates
+## train SVM and return performance metrics
 train_errors, base_rates, accuracies, precisions, recalls, f1_scores = [], [], [], [], [], []
 for train_index, test_index in skf.split(dataset_x, dataset_y):
     train_x, test_x = dataset_x.iloc[train_index], dataset_x.iloc[test_index]
