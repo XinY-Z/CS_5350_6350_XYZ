@@ -1,13 +1,14 @@
 import pandas as pd
 import re
 from sklearn.feature_extraction.text import TfidfVectorizer
-from FinalProject.LanguageModel.Preprocessor import preprocessor
+from FinalProject.LanguageModel.Preprocessor import Preprocessor
 from FinalProject.DataLoader import DataLoader
 
 
 dataloader = DataLoader(r'C:\Users\XinZ\Box\SafeUT_Data\Final_Anonymization\FINAL_ANONYMIZED_SAFEUT.xlsx')
 dataloader.random_select(500)
 dataloader.to_dropout(6)
+preprocessor = Preprocessor(lowercase=True, lemma=True, remove_punc=True, remove_stopwords=False)
 
 class Vectorizer(TfidfVectorizer):
 
@@ -39,9 +40,9 @@ class Vectorizer(TfidfVectorizer):
 
         ## instantiate tf-idf vectorizer
         if isinstance(self.__ngram, int):
-            tfidf = TfidfVectorizer(ngram_range=(self.__ngram, self.__ngram), preprocessor=preprocessor)
+            tfidf = TfidfVectorizer(ngram_range=(self.__ngram, self.__ngram), preprocessor=preprocessor.preprocessor)
         elif isinstance(self.__ngram, tuple):
-            tfidf = TfidfVectorizer(ngram_range=(self.__ngram[0], self.__ngram[1]), preprocessor=preprocessor)
+            tfidf = TfidfVectorizer(ngram_range=(self.__ngram[0], self.__ngram[1]), preprocessor=preprocessor.preprocessor)
         else:
             raise TypeError('Argument "ngram" must be int or tuple.')
 
