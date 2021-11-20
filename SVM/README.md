@@ -14,7 +14,7 @@ default to 0.5. To run the model with the schedule `lrt_t = lrt0 / (1 + t)`, set
 Note: if you are running primal SVM and want to set learning rate schedule, please manually specify `<kernel function>` 
 to `linear`
 
-Primal SVM and linear kernelized SVM will return weights and prediction errors. Gaussian kernalized SVM will return
+Primal SVM and linear kernelized SVM will return weights and prediction errors. Gaussian kernelized SVM will return
 prediction errors only.
 
 A `SettingWithCopyWarning` may appear when loading the datasets. However, it does not affect the performance of the
