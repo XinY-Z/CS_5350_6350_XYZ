@@ -35,7 +35,7 @@ class KernelSVM:
         self.supportAlphaY = None
 
     def fit(self, X, y):
-        print('Currently using kernel/dual SVM...')
+        print('Currently using kernel perceptron...')
         N = len(y)
         hXX = np.apply_along_axis(lambda x1: np.apply_along_axis(lambda x2: self.kernel(x1, x2, self.gamma), 1, X), 1, X)
         yp = y.reshape(-1, 1)

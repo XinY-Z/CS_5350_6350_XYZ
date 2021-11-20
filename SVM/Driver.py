@@ -12,12 +12,12 @@ def get_error(predicted, actual):
     return 1 - correct/float(len(actual))
 
 ## Driver to run the algorithm, and return list of predicted values and error rates
-def run(train_file, test_file, algorithm, gamma, C, max_iter, kernel):
+def run(train_file, test_file, algorithm, gamma, C, max_iter, kernel, which, schedule_a):
     train_x, train_y = algorithm.load_csv(train_file)
     test_x, test_y = algorithm.load_csv(test_file)
 
     if algorithm == SVM:
-        svm = algorithm.SVM(C=C, step=gamma, max_iter=max_iter)
+        svm = algorithm.SVM(C=C, step=gamma, max_iter=max_iter, schedule_a=schedule_a, which=which)
         svm.fit(train_x, train_y)
         train_preds = svm.predict(train_x)
         test_preds = svm.predict(test_x)
@@ -52,13 +52,17 @@ if __name__ == '__main__':
     train_file = sys.argv[1]
     test_file = sys.argv[2]
     alg = sys.argv[3]
-    step = sys.argv[4]
-    C = sys.argv[5]
-    max_iter = sys.argv[6]
+    step = float(sys.argv[4])
+    C = float(sys.argv[5])
+    max_iter = int(sys.argv[6])
     try:
         kernel = sys.argv[7]
+        schedule_a = float(sys.argv[8])
+        which_schedule = int(sys.argv[9])
     except IndexError:
         kernel = 'linear'
+        schedule_a = 0.5
+        which_schedule = 1
 
     if alg == 'svm':
         algorithm = SVM
@@ -66,7 +70,7 @@ if __name__ == '__main__':
         algorithm = KernelSVM
     else:
         raise NameError('Unknown algorithm')
-    run(train_file, test_file, algorithm, step, C, max_iter, kernel)
+    run(train_file, test_file, algorithm, step, C, max_iter, kernel, which_schedule, schedule_a)
 
 trainf = './SVM/bank-note/train.csv'
 testf = './SVM/bank-note/test.csv'

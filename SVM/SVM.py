@@ -15,21 +15,13 @@ def load_csv(filepath):
 
 class SVM:
 
-    def __init__(self, C, step, max_iter):
+    def __init__(self, C, step, max_iter, schedule_a, which):
         self.w = None
         self.C = C
         self.step = step
         self.max_iter = max_iter
-
-    ## select scheduler
-    '''def scheduler(self, step, t, a, which):
-        if which == 1:
-            step_t = step / (1 + step / a * t)
-        elif which == 2:
-            step_t = step / (1 + t)
-        else:
-            Exception('Error: Please indicate your learning rate schedule.')
-        return step_t'''
+        self.schedule_a = schedule_a
+        self.which_schedule = which
 
     ## Build perceptron algorithm
     def fit(self, X, y):
@@ -38,12 +30,18 @@ class SVM:
         self.w = [0] * X.shape[1]
         m = y.shape[0]
         t = 1
+
         for _ in range(self.max_iter):
             rand_ind = np.random.choice(range(m), m, replace=False)
             for i in rand_ind:
                 w0 = self.w[:-1]
                 w0 = np.append(w0, 0)
-                step_t = self.step / (1 + (self.step / 0.5) * t)
+                if self.which_schedule == 1:
+                    step_t = self.step / (1 + (self.step / self.schedule_a) * t)
+                elif self.which_schedule == 2:
+                    step_t = self.step / (1 + t)
+                else:
+                    raise ValueError('Please indicate your learning rate schedule')
                 yi = y.iloc[i].values
                 Xi = X.iloc[i].values
                 predicted = yi * np.dot(Xi.T, self.w)
