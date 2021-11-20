@@ -1,5 +1,5 @@
-from SVM import SVM
-from SVM import KernelSVM
+import SVM
+import KernelSVM
 import sys
 
 
@@ -57,12 +57,12 @@ if __name__ == '__main__':
     max_iter = int(sys.argv[6])
     try:
         kernel = sys.argv[7]
-        schedule_a = float(sys.argv[8])
-        which_schedule = int(sys.argv[9])
+        which_schedule = int(sys.argv[8])
+        schedule_a = float(sys.argv[9])
     except IndexError:
         kernel = 'linear'
-        schedule_a = 0.5
         which_schedule = 1
+        schedule_a = 0.5
 
     if alg == 'svm':
         algorithm = SVM
