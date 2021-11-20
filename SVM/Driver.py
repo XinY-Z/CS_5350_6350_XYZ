@@ -71,6 +71,3 @@ if __name__ == '__main__':
     else:
         raise NameError('Unknown algorithm')
     run(train_file, test_file, algorithm, step, C, max_iter, kernel, which_schedule, schedule_a)
-
-trainf = './SVM/bank-note/train.csv'
-testf = './SVM/bank-note/test.csv'
