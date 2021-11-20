@@ -8,8 +8,8 @@ Any other input will raise an error.
 
 The last 3 arguments are optional. `<kernel function>` is default to linear kernel. For Gaussian kernel, type `gaussian`.
 Under Gaussian kernel, the value of the variance term gamma is taken from the argument `<learning rate/gamma>`.
-`<learning rate schedule>` is default to `lrt_t = lrt0 / (1 + (lrt0/a) * t)`, and the `<a-value>` is default to 0.5. To 
-run the model with the schedule `lrt_t = lrt0 / (1 + t)`, set `<learning rate schedule>` to 2.
+`<learning rate schedule>` is default to 1, which follows `lrt_t = lrt0 / (1 + (lrt0/a) * t)`, and the `<a-value>` is 
+default to 0.5. To run the model with the schedule `lrt_t = lrt0 / (1 + t)`, set `<learning rate schedule>` to 2.
 
 Note: if you are running primal svm and want to set learning rate schedule, please manually specify `<kernel function>` 
 to `linear`
