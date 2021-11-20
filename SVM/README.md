@@ -11,10 +11,11 @@ Under Gaussian kernel, the value of the variance term gamma is taken from the ar
 `<learning rate schedule>` is default to 1, which follows `lrt_t = lrt0 / (1 + (lrt0/a) * t)`, and the `<a-value>` is 
 default to 0.5. To run the model with the schedule `lrt_t = lrt0 / (1 + t)`, set `<learning rate schedule>` to 2.
 
-Note: if you are running primal svm and want to set learning rate schedule, please manually specify `<kernel function>` 
+Note: if you are running primal SVM and want to set learning rate schedule, please manually specify `<kernel function>` 
 to `linear`
 
-The program will return prediction errors.
+Primal SVM and linear kernelized SVM will return weights and prediction errors. Gaussian kernalized SVM will return
+prediction errors only.
 
 A `SettingWithCopyWarning` may appear when loading the datasets. However, it does not affect the performance of the
 program.
