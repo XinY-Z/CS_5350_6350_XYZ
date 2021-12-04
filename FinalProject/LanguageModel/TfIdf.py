@@ -5,20 +5,20 @@ from FinalProject.LanguageModel.Preprocessor import Preprocessor
 from FinalProject.DataLoader import DataLoader
 
 
-dataloader = DataLoader(r'C:\Users\XinZ\Box\SafeUT_Data\Final_Anonymization\FINAL_ANONYMIZED_SAFEUT.xlsx', sheet='Message 1')
-dataloader.random_select(500)
-dataloader.to_dropout(6)
-preprocessor = Preprocessor(lowercase=True, lemma=True, remove_punc=True, remove_stopwords=False)
-
 class Vectorizer(TfidfVectorizer):
 
-    def __init__(self, ngram=2, nmessage=3):
+    def __init__(self, ngram, nmessage, preprocessor):
         super().__init__()
         self.__nmessage = nmessage
         self.__ngram = ngram
-        self.input = dataloader.data
+        self.preprocessor = preprocessor
+        self.input = None
         self.doclist = []
         self.data = pd.DataFrame()
+
+    ## load data into vectorizer
+    def load(self, dataloader):
+        self.input = dataloader.data
 
     ## select first x messages in each encounter as predictor (x=3)
     ## transform data structure to feed sklearn tf-idf vectorizer
@@ -41,9 +41,11 @@ class Vectorizer(TfidfVectorizer):
 
         ## instantiate tf-idf vectorizer
         if isinstance(self.__ngram, int):
-            tfidf = TfidfVectorizer(ngram_range=(self.__ngram, self.__ngram), preprocessor=preprocessor.preprocess)
+            tfidf = TfidfVectorizer(ngram_range=(self.__ngram, self.__ngram),
+                                    preprocessor=self.preprocessor.preprocess)
         elif isinstance(self.__ngram, tuple):
-            tfidf = TfidfVectorizer(ngram_range=(self.__ngram[0], self.__ngram[1]), preprocessor=preprocessor.preprocess)
+            tfidf = TfidfVectorizer(ngram_range=(self.__ngram[0], self.__ngram[1]),
+                                    preprocessor=self.preprocessor.preprocess)
         else:
             raise TypeError('Argument "ngram" must be int or tuple.')
 
@@ -56,5 +58,5 @@ class Vectorizer(TfidfVectorizer):
         ## Create new dataset in which texts are converted to vectors
         dropout_list = self.input.groupby('encounterId').head(1)['dropout'].to_list()
         self.data = pd.DataFrame(data=tf_idf.toarray(),
-                                 columns=['x'+str(i+1) for i in range(tf_idf.toarray().shape[1])])
+                                 columns=['x' + str(i + 1) for i in range(tf_idf.toarray().shape[1])])
         self.data['outcome'] = dropout_list
