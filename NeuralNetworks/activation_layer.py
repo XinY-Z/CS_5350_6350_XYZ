@@ -1,11 +1,11 @@
-from layer import Layer
+from NeuralNetworks.layer import Layer
 
 # inherit from base class Layer
 class ActivationLayer(Layer):
-    def __init__(self, activation, activation_prime):
+    def __init__(self, activation, activation_dx):
         super().__init__()
         self.activation = activation
-        self.activation_prime = activation_prime
+        self.activation_dx = activation_dx
 
     # returns the activated input
     def forward_propagation(self, input_data):
@@ -16,4 +16,4 @@ class ActivationLayer(Layer):
     # Returns input_error=dE/dX for a given output_error=dE/dY.
     # learning_rate is not used because there is no "learnable" parameters.
     def backward_propagation(self, output_error, learning_rate):
-        return self.activation_prime(self.input) * output_error
+        return self.activation_dx(self.input) * output_error

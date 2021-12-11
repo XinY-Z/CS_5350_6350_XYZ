@@ -1,3 +1,4 @@
+# define base layer
 class Layer:
     def __init__(self):
         self.input = None

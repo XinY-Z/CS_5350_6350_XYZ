@@ -1,14 +1,20 @@
-from layer import Layer
+from NeuralNetworks.layer import Layer
 import numpy as np
 
 # inherit from base class Layer
 class FCLayer(Layer):
     # input_size = number of input neurons
     # output_size = number of output neurons
-    def __init__(self, input_size, output_size):
+    def __init__(self, input_size, output_size, init_opt):
         super().__init__()
-        self.weights = np.random.rand(input_size, output_size) - 0.5
-        self.bias = np.random.rand(1, output_size) - 0.5
+        if init_opt == 'gaussian':
+            self.weights = np.random.normal(size=(input_size, output_size))
+            self.bias = np.random.normal(size=(1, output_size))
+        elif init_opt == 'zeros':
+            self.weights = np.zeros(shape=(input_size, output_size))
+            self.bias = np.zeros(shape=(1, output_size))
+        else:
+            raise ValueError('Unknown option. Please type either gaussian or zeros')
 
     # returns output for a given input
     def forward_propagation(self, input_data):
@@ -20,9 +26,9 @@ class FCLayer(Layer):
     def backward_propagation(self, output_error, learning_rate):
         input_error = np.dot(output_error, self.weights.T)
         weights_error = np.dot(self.input.T, output_error)
-        # dBias = output_error
+        bias_error = output_error
 
         # update parameters
         self.weights -= learning_rate * weights_error
-        self.bias -= learning_rate * output_error
+        self.bias -= learning_rate * bias_error
         return input_error
