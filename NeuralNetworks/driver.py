@@ -72,6 +72,3 @@ if __name__ == '__main__':
         learning_d = 0.1
 
     run(train_file, test_file, nodes, epoch, init_option, learning_rate, learning_d)
-
-train_file = './NeuralNetworks/bank-note/train.csv'
-test_file = './NeuralNetworks/bank-note/test.csv'
