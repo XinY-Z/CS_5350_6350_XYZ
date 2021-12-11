@@ -2,11 +2,11 @@ import pandas as pd
 import numpy as np
 import sys
 
-from NeuralNetworks.network import Network
-from NeuralNetworks.fc_layer import FCLayer
-from NeuralNetworks.activation_layer import ActivationLayer
-from NeuralNetworks.activations import sigmoid, sigmoid_dx
-from NeuralNetworks.losses import mse, mse_dx
+from network import Network
+from fc_layer import FCLayer
+from activation_layer import ActivationLayer
+from activations import sigmoid, sigmoid_dx
+from losses import mse, mse_dx
 
 # load data
 def load_csv(filepath):

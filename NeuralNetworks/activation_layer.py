@@ -1,4 +1,4 @@
-from NeuralNetworks.layer import Layer
+from layer import Layer
 
 # inherit from base class Layer
 class ActivationLayer(Layer):
