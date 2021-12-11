@@ -1,6 +1,6 @@
 To run the model, you may simply run the `run.sh` file, or open a command prompt and type  
 
-`python3 Driver.py <directory:training set> <directory:test set> <# nodes> <max iteration> <initiation type> 
+`python3 driver.py <directory:training set> <directory:test set> <# nodes> <max iteration> <initiation type> 
 [<learning rate> <learning d>]`
 
 For `<initiation type>`, type either `gaussian` or `zeros`.
