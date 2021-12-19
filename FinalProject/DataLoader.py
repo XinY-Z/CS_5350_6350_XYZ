@@ -6,10 +6,13 @@ from matplotlib import pyplot as plt
 class DataLoader:
 
     ## initiate and import data
-    def __init__(self, path, sheet='Message 1'):
+    def __init__(self, path):
         self.data_path = path
-        self.data = pd.read_excel(self.data_path, sheet)
+        self.data = pd.read_excel(self.data_path, 'Message 1')
+        tip = pd.read_excel(self.data_path,'Encounter Id')
+        tip_list = tip['encounterId'].unique()
         self.data = self.data.sort_values(['encounterId', 'Unnamed: 0'])
+        self.data = self.data[~self.data['encounterId'].isin(tip_list)]
 
     ## Randomly select a small portion of encounters for testing
     def random_select(self, n=500):

@@ -1,15 +1,15 @@
 from sklearn.linear_model import SGDClassifier
 from sklearn.model_selection import StratifiedKFold
-from sklearn.metrics import f1_score, precision_score, recall_score
+from sklearn.metrics import f1_score, precision_score, recall_score, confusion_matrix
 import numpy as np
 
 
 class SVM(SGDClassifier, StratifiedKFold):
 
-    def __init__(self):
+    def __init__(self, alpha):
         super(SGDClassifier).__init__()
         super(StratifiedKFold).__init__()
-        self.clf = SGDClassifier(loss='hinge', random_state=1)
+        self.clf = SGDClassifier(loss='hinge', random_state=1, alpha=alpha)
         self.skf = None
 
     def kfold(self, n_splits):
@@ -22,7 +22,8 @@ class SVM(SGDClassifier, StratifiedKFold):
         dataset_y = dataset.iloc[:, -1]
 
         ## train SVM and return performance metrics
-        train_errors, base_rates, accuracies, precisions, recalls, f1_scores = [], [], [], [], [], []
+        train_errors, base_rates, accuracies, precisions, recalls, f1_scores, confusions = \
+            [], [], [], [], [], [], []
         for train_index, test_index in self.skf.split(dataset_x, dataset_y):
             train_x, test_x = dataset_x.iloc[train_index], dataset_x.iloc[test_index]
             train_y, test_y = dataset_y.iloc[train_index], dataset_y.iloc[test_index]
@@ -36,6 +37,7 @@ class SVM(SGDClassifier, StratifiedKFold):
             precision = precision_score(test_y, predictions)
             recall = recall_score(test_y, predictions)
             f1 = f1_score(test_y, predictions)
+            conf_mat = confusion_matrix(test_y, predictions)
 
             base_rates.append(base_rate)
             train_errors.append(train_error)
@@ -43,6 +45,7 @@ class SVM(SGDClassifier, StratifiedKFold):
             precisions.append(precision)
             recalls.append(recall)
             f1_scores.append(f1)
+            confusions.append(conf_mat)
 
         print(f'Training error: {np.mean(train_errors)}')
         print(f'Base rate: {np.mean(base_rates)}')
@@ -50,3 +53,4 @@ class SVM(SGDClassifier, StratifiedKFold):
         print(f'Precision: {np.mean(precisions)}')
         print(f'Recall: {np.mean(recalls)}')
         print(f'F1 score: {np.mean(f1_scores)}')
+        print(f'Confusion matrix: {np.mean(confusions, axis=0)}')

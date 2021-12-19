@@ -3,6 +3,7 @@ from FinalProject.LanguageModel.Preprocessor import Preprocessor
 from FinalProject.LanguageModel.TfIdf import Vectorizer
 from FinalProject.Learners.SVM import SVM
 
+alpha_list = [0.0001, 0.00005, 0.00001, 0.000005, 0.000001]
 
 dataloader = DataLoader(r'D:\Users\u1318593\Downloads\FINAL_ANONYMIZED_SAFEUT.xlsx', sheet='Message 1')
 # dataloader.random_select(500)
@@ -16,7 +17,8 @@ vectorizer.text2vec()
 dataset = vectorizer.data
 print('passed 2')
 
-svm = SVM()
-svm.kfold(n_splits=10)
-svm.evaluate(dataset)
+for alpha in alpha_list:
+    svm = SVM(alpha=alpha)
+    svm.kfold(n_splits=10)
+    svm.evaluate(dataset)
 print('all passed')
