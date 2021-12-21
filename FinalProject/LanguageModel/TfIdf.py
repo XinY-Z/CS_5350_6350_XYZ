@@ -1,8 +1,6 @@
 import pandas as pd
 import re
 from sklearn.feature_extraction.text import TfidfVectorizer
-from FinalProject.LanguageModel.Preprocessor import Preprocessor
-from FinalProject.DataLoader import DataLoader
 
 
 class Vectorizer(TfidfVectorizer):
@@ -16,12 +14,12 @@ class Vectorizer(TfidfVectorizer):
         self.doclist = []
         self.data = pd.DataFrame()
 
-    ## load data into vectorizer
+    ## load data
     def load(self, dataloader):
         self.input = dataloader.data
 
     ## select first x messages in each encounter as predictor (x=3)
-    ## transform data structure to feed sklearn tf-idf vectorizer
+    ## transform data structure to fit sklearn tf-idf vectorizer
     def preprocess(self):
 
         ## remove auto-generated messages

@@ -12,9 +12,11 @@ class SVM(SGDClassifier, StratifiedKFold):
         self.clf = SGDClassifier(loss='hinge', random_state=1, alpha=alpha)
         self.skf = None
 
+    ## set k-fold stratified cross validation
     def kfold(self, n_splits):
         self.skf = StratifiedKFold(n_splits=n_splits)
 
+    ## fit and evaluate the model.
     def evaluate(self, dataset):
 
         ## Use stratified k-fold cross validation to split dataset
