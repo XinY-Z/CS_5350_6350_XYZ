@@ -9,7 +9,7 @@ alpha_list = [0.00005, 0.000005, 0.00001, 0.000001]
 ## load the dataset
 dataloader = DataLoader(r'C:\Users\XinZ\Box\SafeUT_Data\Final_Anonymization\FINAL_ANONYMIZED_SAFEUT.xlsx')
 # dataloader.random_select(500)
-dataloader.to_dropout(6)
+dataloader.to_engagement(6)
 print('passed 1')
 
 ## preprocess data and convert to numeric vectors

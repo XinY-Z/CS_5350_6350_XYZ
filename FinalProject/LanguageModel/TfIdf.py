@@ -25,7 +25,7 @@ class Vectorizer(TfidfVectorizer):
         ## remove auto-generated messages
         self.input = self.input[self.input['originator'] != 'Auto']
         data_sel = self.input.groupby('encounterId').head(self.__nmessage)
-        data_sel = data_sel.loc[:, ['messageId', 'encounterId', 'originator', 'message', 'dropout']]
+        data_sel = data_sel.loc[:, ['messageId', 'encounterId', 'originator', 'message', 'engagement']]
         data_sel['message'] = data_sel['message'].apply(lambda x: str(x))
         doclist = data_sel.groupby('encounterId')['message'].apply(list).to_list()
         doclist = [' '.join(doc) for doc in doclist]
@@ -54,7 +54,7 @@ class Vectorizer(TfidfVectorizer):
         dictionary = word_scores.to_dict()['TF-IDF']'''
 
         ## Create new dataset in which texts are converted to vectors
-        dropout_list = self.input.groupby('encounterId').head(1)['dropout'].to_list()
+        engagement_list = self.input.groupby('encounterId').head(1)['engagement'].to_list()
         self.data = pd.DataFrame(data=tf_idf.toarray(),
                                  columns=['x' + str(i + 1) for i in range(tf_idf.toarray().shape[1])])
-        self.data['outcome'] = dropout_list
+        self.data['outcome'] = engagement_list

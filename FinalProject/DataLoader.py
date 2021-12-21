@@ -35,9 +35,9 @@ class DataLoader:
         plt.title('Distribution of Lengths of Conversations, <= 100-message shown')
         return plt
 
-    ## Create and assign outcome (dropout) values
-    def to_dropout(self, cutoff=6):
+    ## Create and assign outcome values
+    def to_engagement(self, cutoff=6):
         sizes = self.data.groupby('encounterId').size()
         sizes.name = 'encounterLen'
         self.data = self.data.join(sizes, on='encounterId')
-        self.data['dropout'] = self.data['encounterLen'].apply(lambda x: 1 if x <= cutoff else 0)
+        self.data['engagement'] = self.data['encounterLen'].apply(lambda x: 1 if x <= cutoff else 0)
