@@ -22,7 +22,7 @@ class Vectorizer(TfidfVectorizer):
     ## transform data structure to fit sklearn tf-idf vectorizer
     def preprocess(self):
 
-        ## remove auto-generated messages
+        ## remove auto-generated messages and convert to lists
         self.input = self.input[self.input['originator'] != 'Auto']
         data_sel = self.input.groupby('encounterId').head(self.__nmessage)
         data_sel = data_sel.loc[:, ['messageId', 'encounterId', 'originator', 'message', 'engagement']]
@@ -49,9 +49,6 @@ class Vectorizer(TfidfVectorizer):
 
         ## Vectorize the texts
         tf_idf = tfidf.fit_transform(self.doclist)
-        '''word_scores = pd.DataFrame(tf_idf[0].T.todense(), index=tfidf.get_feature_names_out(), columns=["TF-IDF"])
-        word_scores = word_scores.sort_values('TF-IDF', ascending=False)
-        dictionary = word_scores.to_dict()['TF-IDF']'''
 
         ## Create new dataset in which texts are converted to vectors
         engagement_list = self.input.groupby('encounterId').head(1)['engagement'].to_list()

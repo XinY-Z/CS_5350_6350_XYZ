@@ -9,8 +9,8 @@ class DataLoader:
     def __init__(self, path):
         self.data_path = path
         self.data = pd.read_excel(self.data_path, 'Message 1')
-        tip = pd.read_excel(self.data_path,'Tip Encounter')
-        tip_list = tip['encounterId'].unique()
+        tip = pd.read_excel(self.data_path, 'Encounter')
+        tip_list = tip.loc[tip['encounterType'] == 'Tip', 'encounterId'].unique()
         self.data = self.data[~self.data['encounterId'].isin(tip_list)]
         self.data = self.data.sort_values(['encounterId', 'Unnamed: 0'])
 

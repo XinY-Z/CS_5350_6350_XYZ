@@ -4,7 +4,7 @@ from FinalProject.LanguageModel.TfIdf import Vectorizer
 from FinalProject.Learners.SVM import SVM
 
 ## set hyperparameters to tune the model
-alpha_list = [0.00005, 0.000005, 0.00001, 0.000001]
+alpha_list = [0.000001, 0.000005, 0.00001, 0.00005]
 
 ## load the dataset
 dataloader = DataLoader(r'C:\Users\XinZ\Box\SafeUT_Data\Final_Anonymization\FINAL_ANONYMIZED_SAFEUT.xlsx')
