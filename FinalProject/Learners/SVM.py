@@ -17,18 +17,18 @@ class SVM(SGDClassifier, StratifiedKFold):
         self.skf = StratifiedKFold(n_splits=n_splits)
 
     ## fit and evaluate the model.
-    def evaluate(self, dataset):
+    def evaluate(self, X, y):
+
+        dataset_x = X
+        dataset_y = y
 
         ## Use stratified k-fold cross validation to split dataset
-        dataset_x = dataset.iloc[:, :-1]
-        dataset_y = dataset.iloc[:, -1]
-
         ## train SVM and return performance metrics
         train_errors, base_rates, accuracies, precisions, recalls, f1_scores, confusions = \
             [], [], [], [], [], [], []
         for train_index, test_index in self.skf.split(dataset_x, dataset_y):
-            train_x, test_x = dataset_x.iloc[train_index], dataset_x.iloc[test_index]
-            train_y, test_y = dataset_y.iloc[train_index], dataset_y.iloc[test_index]
+            train_x, test_x = dataset_x[train_index], dataset_x[test_index]
+            train_y, test_y = dataset_y[train_index], dataset_y[test_index]
 
             self.clf.fit(train_x, train_y)
             base_rate = test_y.mean()

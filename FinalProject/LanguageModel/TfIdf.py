@@ -1,5 +1,5 @@
-import pandas as pd
 import re
+import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 
 
@@ -12,7 +12,8 @@ class Vectorizer(TfidfVectorizer):
         self.preprocessor = preprocessor
         self.input = None
         self.doclist = []
-        self.data = pd.DataFrame()
+        self.X = None
+        self.y = None
 
     ## load data
     def load(self, dataloader):
@@ -49,9 +50,8 @@ class Vectorizer(TfidfVectorizer):
 
         ## Vectorize the texts
         tf_idf = tfidf.fit_transform(self.doclist)
+        self.X = tf_idf
 
         ## Create new dataset in which texts are converted to vectors
         engagement_list = self.input.groupby('encounterId').head(1)['engagement'].to_list()
-        self.data = pd.DataFrame(data=tf_idf.toarray(),
-                                 columns=['x' + str(i + 1) for i in range(tf_idf.toarray().shape[1])])
-        self.data['outcome'] = engagement_list
+        self.y = np.array(engagement_list)

@@ -4,10 +4,10 @@ from FinalProject.LanguageModel.TfIdf import Vectorizer
 from FinalProject.Learners.SVM import SVM
 
 ## set hyperparameters to tune the model
-alpha_list = [0.000001, 0.000005, 0.00001, 0.00003]
+alpha_list = [0.0001, 0.00005, 0.00001, 0.000005, 0.000001]
 
 ## load the dataset
-dataloader = DataLoader(r'C:\Users\XinZ\Box\SafeUT_Data\Final_Anonymization\FINAL_ANONYMIZED_SAFEUT.xlsx')
+dataloader = DataLoader('/uufs/chpc.utah.edu/common/HIPAA/u1318593/Downloads/SafeUT/FINAL_ANONYMIZED_SAFEUT.xlsx')
 # dataloader.random_select(500)
 dataloader.to_engagement(6)
 print('passed 1')
@@ -24,5 +24,5 @@ for alpha in alpha_list:
     print(f'Now using alpha={alpha}')
     svm = SVM(alpha=alpha)
     svm.kfold(n_splits=10)
-    svm.evaluate(vectorizer.data)
+    svm.evaluate(vectorizer.X, vectorizer.y)
 print('all passed')

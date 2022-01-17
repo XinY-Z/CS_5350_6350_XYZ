@@ -8,8 +8,8 @@ class DataLoader:
     ## initiate and import data
     def __init__(self, path):
         self.data_path = path
-        self.data = pd.read_excel(self.data_path, 'Message 1')
-        tip = pd.read_excel(self.data_path, 'Encounter')
+        self.data = pd.read_excel(self.data_path, 'Message 1', engine='openpyxl')
+        tip = pd.read_excel(self.data_path, 'Encounter', engine='openpyxl')
         tip_list = tip.loc[tip['encounterType'] == 'Tip', 'encounterId'].unique()
         self.data = self.data[~self.data['encounterId'].isin(tip_list)]
         self.data = self.data.sort_values(['encounterId', 'Unnamed: 0'])
