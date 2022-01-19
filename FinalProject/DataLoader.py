@@ -33,7 +33,7 @@ class DataLoader:
         plt.xticks(range(0, 101, 10))
         plt.xlabel('Number of Messages')
         plt.title('Distribution of Lengths of Conversations, <= 100-message shown')
-        return plt
+        plt.show()
 
     ## Create and assign outcome values
     def to_engagement(self, cutoff=6):
